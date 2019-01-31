@@ -1,43 +1,43 @@
 package org.techtown.hello;
 
 import android.content.Intent;
-import android.net.Uri;
-import android.os.Bundle;
+import android.media.Image;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.Toast;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity extends AppCompatActivity {
 
-    Button Button_Camera;
+    Button button;
     ImageView imageView;
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Button_Camera = (Button) findViewById(R.id.camera);
-        imageView = (ImageView) findViewById(R.id.view);
-        Button_Camera.setOnClickListener(this);
+        button = (Button) findViewById(R.id.button);
+        imageView = (ImageView) findViewById(R.id.imageView);
     }
 
-    @Override
-    public void onClick(View view){
-        Intent i = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        startActivityForResult(i,0);
+    public void gotoCamera(View v){
+        Intent intent = new Intent(this, Camera.class);
+        startActivity(intent);
+        //startActivityForResult(intent,1);
     }
 
-    //  사진을 찍고 사진을 가져와요, intent의 결과를 여기서 확인할 수 있음
-    @Override
+    /*
     protected void onActivityResult(int requestCode, int resultCode, Intent data){
+        if(requestCode==1){
+            if(resultCode==RESULT_OK){
+                imageView.setImageResource(R.drawable.logo1);
+            }
+        }
         //data.getData()를 통해 방금 찍은 사진의 uri 가지고 일 수 있음
-        imageView.setImageURI(data.getData());
-    }
 
+    }
+    */
 }
