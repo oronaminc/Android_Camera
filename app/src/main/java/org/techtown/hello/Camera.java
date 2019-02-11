@@ -1,7 +1,6 @@
 package org.techtown.hello;
 
 import android.Manifest;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -18,12 +17,16 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
 import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class Camera extends AppCompatActivity {
 
@@ -33,10 +36,14 @@ public class Camera extends AppCompatActivity {
 
     Button Button_Camera;
     Button Button_Album;
+    Button Button_Get_Image;
     ImageView imageView;
+    ImageView imageView2;
     File file;
+    String mCurrentPhotoPath;
 
     Uri imageUri;
+    Uri photoURI, albumURI;
 
 
     @Override
@@ -44,29 +51,49 @@ public class Camera extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_camera);
 
-        String sdcard = Environment.getExternalStorageDirectory()+"/AP/";
+        //String sdcard = Environment.getExternalStorageDirectory()+"/AP/";
         //File sdcard = Environment.getExternalStorageDirectory();
-        File dir = new File(sdcard);
-
-        if(!dir.exists()){dir.mkdirs();}
-
-        file = new File(sdcard, "photo.jpg");
-
-        Toast.makeText(getApplicationContext(), file.toString(), Toast.LENGTH_SHORT).show();
 
         checkPermission();
 
         Button_Camera = (Button) findViewById(R.id.camera);
         Button_Album = (Button) findViewById(R.id.album);
+        Button_Get_Image = (Button) findViewById(R.id.get_image);
         imageView = (ImageView) findViewById(R.id.view);
+        imageView2 = (ImageView) findViewById(R.id.imageView);
 
         Button_Camera.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
+                /*
                 Intent i = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                 Uri uri = FileProvider.getUriForFile(getApplicationContext(), "com.bignerdranch.android.test.fileprovider", file);
+                imageUri = uri;
                 i.putExtra(MediaStore.EXTRA_OUTPUT, uri);
                 startActivityForResult(i,REQUEST_TAKE_PHOTO);
+                */
+                Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+                    File photoFile = null;
+                    try {
+                        photoFile = createImageFile();
+                    } catch (IOException ex) {
+                        Log.e("captureCamera Error", ex.toString());
+                    }
+                    if (photoFile != null) {
+                        // getUriForFile의 두 번째 인자는 Manifest provier의 authorites와 일치해야 함
+
+                        Uri providerURI = FileProvider.getUriForFile(getApplicationContext(), "com.bignerdranch.test.fileprovider", photoFile);
+                        imageUri = providerURI;
+
+                        // 인텐트에 전달할 때는 FileProvier의 Return값인 content://로만!!, providerURI의 값에 카메라 데이터를 넣어 보냄
+                        takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, providerURI);
+
+                        startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
+                    }
+                } else {
+                    Toast.makeText(getApplicationContext(), "저장공간이 접근 불가능한 기기입니다", Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
@@ -80,21 +107,95 @@ public class Camera extends AppCompatActivity {
             }
         });
 
+        Button_Get_Image.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                File imgFile2 = new File(Environment.getExternalStorageDirectory() + "/AP/album/JPEG_20190208_160909.jpg");
+                File path = new File(Environment.getExternalStorageDirectory() + "/AP/album");
+
+                String files[] = path.list();
+
+                for( int i = 0; i<files.length; i++){
+                    String k = String.valueOf(i);
+                    //Toast.makeText(getApplicationContext(),files[i], Toast.LENGTH_SHORT).show();
+                    //File k = new File(Environment.getExternalStorageDirectory() + "/AP/album/"+files[i]);
+
+                }
+
+                Toast.makeText(getApplicationContext(),imgFile2.getAbsolutePath(), Toast.LENGTH_SHORT).show();
+                if (imgFile2.exists()) {
+                    Toast.makeText(getApplicationContext(),"파일존재", Toast.LENGTH_SHORT).show();
+                    Bitmap myBitmap = BitmapFactory.decodeFile(imgFile2.getAbsolutePath());
+                    imageView2.setImageBitmap(myBitmap);
+                } else {
+                    Toast.makeText(getApplicationContext(),"파일 음슴", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
 
     }
+
+    public File createImageFile() throws IOException {
+        // Create an image file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + ".jpg";
+        File imageFile = null;
+        File storageDir = new File(Environment.getExternalStorageDirectory() + "/AP", "album");
+
+        if (!storageDir.exists()) {
+            Log.i("mCurrentPhotoPath1", storageDir.toString());
+            storageDir.mkdirs();
+        }
+
+        imageFile = new File(storageDir, imageFileName);
+        mCurrentPhotoPath = imageFile.getAbsolutePath();
+
+        return imageFile;
+    }
+
 
 
     //  사진을 찍고 사진을 가져와요, intent의 결과를 여기서 확인할 수 있음
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data){
+
+        switch(requestCode){
+            case REQUEST_TAKE_PHOTO:
+                if(resultCode == RESULT_OK){
+                    galleryAddPic();
+                    imageView.setImageURI(imageUri);
+                    Toast.makeText(getApplicationContext(), "사진을 잘 찍었습니다.", Toast.LENGTH_SHORT).show();
+                } else{
+                    Toast.makeText(getApplicationContext(),"사진 찍기를 취소했습니다.", Toast.LENGTH_SHORT).show();
+                }
+                break;
+
+            case REQUEST_TAKE_ALBUM:
+                if(resultCode == RESULT_OK){
+                        }
+
+                    }
+    }
+
+    private void galleryAddPic(){
+        Log.i("galleryAddPic", "Call");
+        Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+        // 해당 경로에 있는 파일을 객체화(새로 파일을 만든다는 것으로 이해하면 안 됨)
+        File f = new File(mCurrentPhotoPath);
+        Uri contentUri = Uri.fromFile(f);
+        mediaScanIntent.setData(contentUri);
+        sendBroadcast(mediaScanIntent);
+        Toast.makeText(this, contentUri.getPath() + "에 저장되었습니다.", Toast.LENGTH_SHORT).show();
+    }
+
+
+        /*
         if(requestCode==REQUEST_TAKE_PHOTO && resultCode == Activity.RESULT_OK){
             Toast.makeText(getApplicationContext(),"성공", Toast.LENGTH_SHORT).show();
             //imageView.setImageURI(data.getData());
 
-            BitmapFactory.Options options = new BitmapFactory.Options();
-            options.inSampleSize=8;
-            Bitmap bitmap = BitmapFactory.decodeFile(file.getAbsolutePath(),options);
-            imageView.setImageBitmap(bitmap);
+            imageView.setImageURI(imageUri);
                 //Bundle extras = data.getExtras();
                 //Bitmap imageBitmap = (Bitmap) extras.get("data");
                 //ImageView.setImageBitmap(imageBitmap);
@@ -102,9 +203,10 @@ public class Camera extends AppCompatActivity {
             Toast.makeText(getApplicationContext(),"실패", Toast.LENGTH_SHORT).show();
             return ;
         }
+        */
         //data.getData()를 통해 방금 찍은 사진의 uri 가지고 일 수 있음
 
-    }
+
 
     private void checkPermission() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {

@@ -5,10 +5,6 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
-    <!--
-    <uses-permission android:name="android.permission.CAMERA"/>
-    -->
-
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -16,10 +12,11 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".GalleryDetailActivity"></activity>
 
         <provider
             android:name="android.support.v4.content.FileProvider"
-            android:authorities="com.bignerdranch.android.test.fileprovider"
+            android:authorities="com.bignerdranch.test.fileprovider"
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data
@@ -27,8 +24,7 @@
                 android:resource="@xml/filepaths" />
         </provider>
 
-
-        <activity android:name=".Camera"></activity>
+        <activity android:name=".Camera" />
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

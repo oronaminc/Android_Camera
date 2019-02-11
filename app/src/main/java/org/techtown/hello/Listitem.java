@@ -1,11 +1,11 @@
 package org.techtown.hello;
 
-public class Adapter {
+public class Listitem {
     private String id;
     private String path;
     private boolean isSelected;
 
-    public Adapter(String id, String path) {
+    public Listitem(String id, String path) {
         this.id = id;
         this.path = path;
         this.isSelected = false;
