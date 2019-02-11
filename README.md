@@ -12,7 +12,7 @@ Screenshots
 
 </div>
 <h3>
-Adding grid album
++ Adding grid album
  </h3>
 
 <div>
