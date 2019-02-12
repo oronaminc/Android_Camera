@@ -1,6 +1,9 @@
 # Android_Camera
 
-Using MediaStore.ACTION_IMAGE_CAPTURE method
+* Using MediaStore.ACTION_IMAGE_CAPTURE method
+
+* you must add `<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>`
+             & `<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>`in AndroidManifest.xml
 
 Screenshots
 -----------
