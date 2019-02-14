@@ -14,6 +14,7 @@ Screenshots
 <img width="200" src="https://user-images.githubusercontent.com/37185394/51883633-205de800-23c7-11e9-9f84-23131bb969b9.PNG">
 
 </div>
+
 <h3>
 + Adding grid album
  </h3>
